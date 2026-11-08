@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambridge FCE — Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ========== GİRİŞ EKRANI ========== -->
+<div id="authScreen" class="screen active">
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>Cambridge FCE</h1>
+            <p>Platformasına xoş gəlmisiniz</p>
+        </div>
+
+        <!-- Giriş Formu -->
+        <div id="loginForm" class="auth-form active">
+            <h2>Giriş</h2>
+            <input type="email" id="loginEmail" placeholder="Email" required>
+            <input type="password" id="loginPassword" placeholder="Parol" required>
+            <button onclick="login()">Giriş et</button>
+            <p class="switch-form">Hesabınız yoxdur? <a onclick="showRegister()">Qeydiyyat</a></p>
+            <div class="admin-hint">
+                <strong>Admin:</strong> admin@fce.com / admin123
+            </div>
+        </div>
+
+        <!-- Qeydiyyat Formu -->
+        <div id="registerForm" class="auth-form">
+            <h2>Qeydiyyat</h2>
+            <input type="text" id="regName" placeholder="Ad Soyad" required>
+            <input type="email" id="regEmail" placeholder="Email" required>
+            <input type="password" id="regPassword" placeholder="Parol" required>
+            <button onclick="register()">Qeydiyyatdan keç</button>
+            <p class="switch-form">Hesabınız var? <a onclick="showLogin()">Giriş</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- ========== ƏSAS PLATFORM ========== -->
+<div id="platformScreen" class="screen">
+    <header class="platform-header">
+        <div class="logo">Cambridge <span>FCE</span> — Platform</div>
+        <div class="user-info">
+            <span id="userName"></span>
+            <button onclick="logout()" class="btn-logout">Çıxış</button>
+        </div>
+    </header>
+
+    <main class="platform-main">
+        <h2>İmtahanlar</h2>
+        <p class="subtitle">Mövcud imtahanlardan birini seçin</p>
+        
+        <div id="examsList" class="exams-grid">
+            <!-- JavaScript ilə doldurulacaq -->
+        </div>
+    </main>
+</div>
+
+<!-- ========== İMTAHAN EKRANI ========== -->
+<div id="examScreen" class="screen">
+    <header class="platform-header">
+        <div class="logo">Cambridge <span>FCE</span></div>
+        <button onclick="backToPlatform()" class="btn-back">← Geri</button>
+    </header>
+
+    <main class="exam-main">
+        <div class="exam-header">
+            <h2 id="examTitle">Part 1</h2>
+            <div class="progress">
+                <span id="questionCounter">0/8</span>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="questionContainer" class="question-container">
+            <!-- Suallar buraya yüklənəcək -->
+        </div>
+
+        <div class="exam-actions">
+            <button onclick="prevQuestion()" id="prevBtn" class="btn-secondary" disabled>Əvvəlki</button>
+            <button onclick="nextQuestion()" id="nextBtn" class="btn-primary">Növbəti</button>
+        </div>
+    </main>
+</div>
+
+<!-- ========== NƏTİCƏ EKRANI ========== -->
+<div id="resultScreen" class="screen">
+    <div class="result-container">
+        <div class="result-icon">🎉</div>
+        <h2>İmtahan Tamamlandı!</h2>
+        <div class="result-score">
+            <div class="score-circle">
+                <span id="scoreValue">0</span>
+                <span class="score-total">/ <span id="totalQuestions">8</span></span>
+            </div>
+            <p id="scoreMessage">Əla nəticə!</p>
+        </div>
+        <div class="result-actions">
+            <button onclick="backToPlatform()" class="btn-primary">Əsas Səhifəyə</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== ADMİN PANEL ========== -->
+<div id="adminScreen" class="screen">
+    <header class="admin-header">
+        <div class="logo">🛠️ Admin Panel</div>
+        <button onclick="logout()" class="btn-logout">Çıxış</button>
+    </header>
+
+    <div class="admin-layout">
+        <nav class="admin-nav">
+            <button onclick="showAdminTab('users', this)" class="nav-btn active">👥 İstifadəçilər</button>
+            <button onclick="showAdminTab('exams', this)" class="nav-btn">📋 İmtahanlar</button>
+            <button onclick="showAdminTab('scores', this)" class="nav-btn">⚙️ Ballar</button>
+            <button onclick="showAdminTab('results', this)" class="nav-btn">📊 Nəticələr</button>
+        </nav>
+
+        <main class="admin-content">
+            <!-- İstifadəçilər -->
+            <div id="usersTab" class="admin-tab active">
+                <h3>Qeydiyyatdan keçmiş istifadəçilər</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Ad</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Tamamlanan</th>
+                            <th>Əməliyyat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- İmtahanlar -->
+            <div id="examsTab" class="admin-tab">
+                <h3>İmtahan siyahısı</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ad</th>
+                            <th>Partlar</th>
+                            <th>Ümumi sual</th>
+                        </tr>
+                    </thead>
+                    <tbody id="examsTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Ballar -->
+            <div id="scoresTab" class="admin-tab">
+                <h3>Hər sual üçün bal təyini</h3>
+                <div class="score-form">
+                    <label>İmtahan seçin:</label>
+                    <select id="scoreExamSelect" onchange="loadScoreForm()">
+                        <option value="">-- Seçin --</option>
+                    </select>
+                    <div id="scoreFormContainer"></div>
+                </div>
+            </div>
+
+            <!-- Nəticələr -->
+            <div id="resultsTab" class="admin-tab">
+                <h3>Şagird nəticələri</h3>
+                <div class="results-filter">
+                    <label>Şagird seçin:</label>
+                    <select id="resultsStudentSelect" onchange="loadResultsTable()">
+                        <option value="">-- Bütün şagirdlər --</option>
+                    </select>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Şagird</th>
+                            <th>İmtahan</th>
+                            <th>Bal</th>
+                            <th>Tarix</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Admin Panel FAB -->
+<button id="adminFab" class="admin-fab" onclick="openAdminPanel()" title="Admin Panel">
+    🛠️
+</button>
+
+<script src="app.js"></script>
+</body>
+</html>
