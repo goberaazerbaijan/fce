@@ -1,5 +1,5 @@
 // ==================== DATA ====================
-const EXAMS = { fce_full: { id:'fce_full', title:'FCE Full Practice Test', icon:'📚', description:'Tam FCE Reading & Use of English imtahanı (7 Part)', parts:['part1','part2','part3','part4','part5','part6','part7'] } };
+const EXAMS = { fce_full: { id:'fce_full', title:'FCE Full Practice Test', icon:'', description:'Tam FCE Reading & Use of English imtahanı (7 Part)', parts:['part1','part2','part3','part4','part5','part6','part7'] } };
 
 const part1Data = { id:'part1',moduleNum:1,moduleTitle:"Part 1 — Multiple Choice Cloze",moduleSubtitle:"Hər boşluq üçün ən uyğun variantı seçin",title:"The world's deepest underwater cave?",subtitle:"Test 1 — Reading and Use of English",instructions:"For questions <strong>1–8</strong>, decide which answer (<strong>A, B, C or D</strong>) best fits each gap.",paragraphs:['Polish explorer Krzysztof Starnawski (0) [keeps] returning to Hranická Propast, an underwater cave in the Czech Republic. His fascination with the cave began during his first dive there, when he started to (1) _______ that it might be possible to go far deeper than any other dive had ever taken him before.','Returning a few years later, Starnawski dived to 200 m, but was stopped by a narrow passage in the rock that (2) _______ to a tunnel. He lowered a probe – a weight on the end of a long rope – and still didn\'t hit the bottom of the cave.','On his next visit, the following year, he found that the passage had widened (3) _______. He swam through it down to 265 m. Then Starnawski went back again, (4) _______ by a remotely-operated underwater robot, which (5) _______ its way to a record-breaking depth of 404 m.','Starnawski is (6) _______ to continue to explore this mysterious, (7) _______ unending cave, believing that it may (8) _______ out to be even deeper!'],questions:[{num:1,options:{A:"suspect",B:"wonder",C:"expect",D:"assess"},answer:"B",explanation:"'wonder' — düşünmək."},{num:2,options:{A:"guided",B:"led",C:"headed",D:"ran"},answer:"B",explanation:"'led to' — apardı."},{num:3,options:{A:"largely",B:"entirely",C:"excessively",D:"considerably"},answer:"D",explanation:"'considerably' — xeyli."},{num:4,options:{A:"attended",B:"provided",C:"accompanied",D:"supplied"},answer:"C",explanation:"'accompanied by'."},{num:5,options:{A:"broke",B:"made",C:"went",D:"gave"},answer:"B",explanation:"'made its way'."},{num:6,options:{A:"committed",B:"determined",C:"intended",D:"dedicated"},answer:"B",explanation:"'determined to'."},{num:7,options:{A:"apparently",B:"distinctly",C:"noticeably",D:"particularly"},answer:"A",explanation:"'apparently'."},{num:8,options:{A:"set",B:"end",C:"turn",D:"come"},answer:"D",explanation:"'come out to be'."}] };
 
@@ -26,7 +26,7 @@ let currentUser = null;
 function loadUsers(){ try { return JSON.parse(localStorage.getItem('fce_users')||'[]'); } catch(e){ return []; } }
 function saveUsers(users){ localStorage.setItem('fce_users',JSON.stringify(users)); }
 function loadPoints(){ try { return JSON.parse(localStorage.getItem('fce_points')||'{}'); } catch(e){ return {}; } }
-function savePoints(p){ localStorage.setItem('fce_points',JSON.stringify(p)); }
+function savePoints(points){ localStorage.setItem('fce_points',JSON.stringify(points)); }
 
 function initDB(){
   let users = loadUsers();
@@ -178,14 +178,14 @@ function renderLayout(){
   if(currentModuleId==='part1'||currentModuleId==='part5'){
     layout.innerHTML = `<div class="left-panel" id="leftPanel"></div><div class="right-panel"><div class="q-content" id="qContent"></div><div class="q-nav"><button class="nav-btn btn-prev" id="btnPrev" onclick="prevQuestion()">← Əvvəlki</button><span class="nav-status" id="navStatus">Cavab seçilən kimi avtomatik keçəcək...</span><button class="nav-btn btn-hint" id="btnHint" onclick="toggleHint()">💡</button><button class="nav-btn btn-next" id="btnNext" onclick="nextQuestion()">Növbəti →</button></div></div>`;
   } else if(['part2','part3','part4'].includes(currentModuleId)){
-    layout.innerHTML = `<div class="left-panel" id="leftPanel"></div><div class="right-panel"><div class="q-content" id="qContent"></div><div class="q-nav"><button class="nav-btn btn-prev" id="btnPrev" onclick="prevQuestion()">← Əvvəlki</button><span class="nav-status" id="navStatus">Cavab yazın və Növbəti düyməsini basın</span><button class="nav-btn btn-hint" id="btnHint" onclick="toggleHint()">💡</button><button class="nav-btn btn-next" id="btnNext" onclick="nextQuestion()">Növbəti →</button></div></div>`;
+    layout.innerHTML = `<div class="left-panel" id="leftPanel"></div><div class="right-panel"><div class="q-content" id="qContent"></div><div class="q-nav"><button class="nav-btn btn-prev" id="btnPrev" onclick="prevQuestion()">← Əvvəlki</button><span class="nav-status" id="navStatus">Cavab yazın və Növbəti düyməsini basın</span><button class="nav-btn btn-hint" id="btnHint" onclick="toggleHint()"></button><button class="nav-btn btn-next" id="btnNext" onclick="nextQuestion()">Növbəti →</button></div></div>`;
   } else if(currentModuleId==='part6'){
-    layout.innerHTML = `<div class="left-panel" id="leftPanel"></div><div class="right-panel"><div class="q-content" id="qContent"></div><div class="q-nav"><button class="nav-btn btn-prev" id="btnPrev" onclick="prevQuestion()">← Əvvəlki</button><span class="nav-status" id="navStatus">Cavab seçilən kimi avtomatik keçəcək...</span><button class="nav-btn btn-hint" id="btnHint" onclick="toggleHint()">💡</button><button class="nav-btn btn-next" id="btnNext" onclick="nextQuestion()">Növbəti →</button></div></div>`;
+    layout.innerHTML = `<div class="left-panel" id="leftPanel"></div><div class="right-panel"><div class="q-content" id="qContent"></div><div class="q-nav"><button class="nav-btn btn-prev" id="btnPrev" onclick="prevQuestion()">← Əvvəlki</button><span class="nav-status" id="navStatus">Cavab seçilən kimi avtomatik keçəcək...</span><button class="nav-btn btn-hint" id="btnHint" onclick="toggleHint()"></button><button class="nav-btn btn-next" id="btnNext" onclick="nextQuestion()">Növbəti →</button></div></div>`;
   } else if(currentModuleId==='part7'){
     layout.innerHTML = `<div class="left-panel" id="leftPanel"></div><div class="right-panel"><div class="right-panel-scroll" id="rightPanelScroll"></div><div class="q-nav"><button class="nav-btn btn-prev" id="btnPrev" onclick="prevQuestion()">← Əvvəlki</button><span class="nav-status" id="navStatus">Cavab seçilən kimi avtomatik keçəcək...</span><button class="nav-btn btn-next" id="btnNext" onclick="nextQuestion()">Növbəti →</button></div></div>`;
   }
-  const transitionHTML = `<div class="transition-screen" id="transitionScreen"><div class="transition-card"><div class="transition-icon">🎯</div><div class="transition-title" id="tTitle">Modul Tamamlandı!</div><div class="transition-text" id="tText"></div><div class="transition-stats"><div class="stats-title">📊 İcmal</div><div class="stats-grid"><div class="stat-box"><div class="stat-value" id="statAnswered">0</div><div class="stat-label">Cavablanan</div></div><div class="stat-box"><div class="stat-value" id="statRemaining">0</div><div class="stat-label">Boş</div></div><div class="stat-box"><div class="stat-value" id="statModule">—</div><div class="stat-label">Modul</div></div></div></div><div class="transition-buttons"><button class="btn-review" onclick="reviewCurrent()">↻ Geri Qayıt</button><button class="btn-continue" id="btnContinue">Növbəti Parta Keç →</button></div></div></div>`;
-  const resultsHTML = `<div class="results-screen" id="resultsScreen"><div class="results-card"><div class="results-emoji" id="rEmoji">🏆</div><div class="results-title" id="rTitle">İmtahan Tamamlandı!</div><div class="results-score"><span id="rScore">0</span>/<span id="rTotal">0</span></div><div class="results-msg" id="rMsg"></div><div class="results-breakdown" id="rBreakdown"></div><div class="final-review" id="finalReview"></div><button class="btn-carnet" onclick="showCarnet()">📜 Karneti Gör</button><button class="btn-restart" onclick="backToExams()">🏠 İmtahanlara Qayıt</button></div></div>`;
+  const transitionHTML = `<div class="transition-screen" id="transitionScreen"><div class="transition-card"><div class="transition-icon">🎯</div><div class="transition-title" id="tTitle">Modul Tamamlandı!</div><div class="transition-text" id="tText"></div><div class="transition-stats"><div class="stats-title">📊 İCMAL</div><div class="stats-grid"><div class="stat-box"><div class="stat-value" id="statAnswered">0</div><div class="stat-label">Cavablanan</div></div><div class="stat-box"><div class="stat-value" id="statRemaining">0</div><div class="stat-label">Boş</div></div><div class="stat-box"><div class="stat-value" id="statModule">—</div><div class="stat-label">Modul</div></div></div></div><div class="transition-buttons"><button class="btn-review" onclick="reviewCurrent()">↻ Geri Qayıt</button><button class="btn-continue" id="btnContinue" onkeypress="if(event.key==='Enter')continueToNext()">Növbəti Parta Keç →</button></div></div></div>`;
+  const resultsHTML = `<div class="results-screen" id="resultsScreen"><div class="results-card"><div class="results-emoji" id="rEmoji">🏆</div><div class="results-title" id="rTitle">İmtahan Tamamlandı!</div><div class="results-score"><span id="rScore">0</span>/<span id="rTotal">0</span></div><div class="results-msg" id="rMsg"></div><div class="results-breakdown" id="rBreakdown"></div><div class="final-review" id="finalReview"></div><button class="btn-carnet" onclick="showCarnet()" onkeypress="if(event.key==='Enter')showCarnet()">📜 NƏTİCƏ VƏRƏQİ</button><button class="btn-restart" onclick="backToExams()" onkeypress="if(event.key==='Enter')backToExams()">🏠 İmtahanlara Qayıt</button></div></div>`;
   layout.insertAdjacentHTML('beforeend',transitionHTML);
   layout.insertAdjacentHTML('beforeend',resultsHTML);
 }
@@ -328,7 +328,7 @@ function renderQuestion(){
     const q = mod.questions[currentQ];
     const val = answers[q.num]||'';
     const rp = document.getElementById('rightPanelScroll');
-    let rhtml = `<h3 style="font-family:'Merriweather',serif;font-size:15px;color:#1a1a2e;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #1a1a2e;">👤 Şəxslər <span style="font-size:11px;color:#9ca3af;font-weight:400;margin-left:8px;font-family:'Inter',sans-serif;">(kardı klikləyin)</span></h3>`;
+    let rhtml = `<h3 style="font-family:'Merriweather',serif;font-size:15px;color:#1a1a2e;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #1a1a2e;"> Şəxslər <span style="font-size:11px;color:#9ca3af;font-weight:400;margin-left:8px;font-family:'Inter',sans-serif;">(kardı klikləyin)</span></h3>`;
     Object.entries(mod.people).forEach(([letter,person])=>{
       let bc='transparent',blc='#1a1a2e',bg='#fff',bs='0 2px 8px rgba(0,0,0,0.05)',lb='#1a1a2e',lc='#fbbf24';
       if(val===letter){ bc='#2563eb';blc='#2563eb';bg='#eff6ff';bs='0 4px 12px rgba(37,99,235,0.15)';lb='#2563eb';lc='#fff'; }
@@ -499,7 +499,7 @@ function showFinalResults(){
   saveCurrentUser();
 
   let emoji,msg;
-  if(pct>=90){ emoji='🏆'; msg='Mükəmməl nəticə!'; } else if(pct>=75){ emoji='🎉'; msg='Əla iş!'; } else if(pct>=60){ emoji='💪'; msg='Yaxşı nəticə!'; } else if(pct>=40){ emoji='📚'; msg='Orta səviyyə.'; } else { emoji='💪'; msg='Daha çox çalışın!'; }
+  if(pct>=90){ emoji='🏆'; msg='Mükəmməl nəticə!'; } else if(pct>=75){ emoji=''; msg='Əla iş!'; } else if(pct>=60){ emoji='💪'; msg='Yaxşı nəticə!'; } else if(pct>=40){ emoji='📚'; msg='Orta səviyyə.'; } else { emoji='💪'; msg='Daha çox çalışın!'; }
 
   document.getElementById('rEmoji').textContent = emoji;
   document.getElementById('rTitle').textContent = 'İmtahan Tamamlandı!';
@@ -537,9 +537,9 @@ function showCarnet(){
   if(!score) return;
   const exam = EXAMS[currentExamId];
   const date = new Date(score.date).toLocaleString('az-AZ');
-  let html = `<div class="carnet-card"><div class="carnet-header"><div class="school">Cambridge FCE Platform</div><h1>📜 İmtahan Karneti</h1><div style="font-size:14px;color:#6b7280;margin-top:6px">${exam.title}</div></div><div class="carnet-student"><div><strong>Ad Soyad:</strong> ${currentUser.name}</div><div><strong>Email:</strong> ${currentUser.email}</div><div><strong>Tarix:</strong> ${date}</div><div><strong>Ümumi bal:</strong> ${score.points}/${score.maxPoints} (${score.percent}%)</div></div><div class="carnet-total"><div class="total-label">Yekun Qiymət</div><div class="grade-badge grade-${score.grade}">${score.grade} — ${score.gradeText}</div><div style="margin-top:12px;font-size:14px;opacity:0.9">Düzgün cavab: ${score.correct}/${score.total} sual</div></div><table class="carnet-table"><thead><tr><th>Part</th><th>Sual</th><th>Cavab</th><th>Düzgün</th><th>Bal</th></tr></thead><tbody>`;
+  let html = `<div class="carnet-card"><div class="carnet-header"><div class="school">CAMBRIDGE FCE PLATFORM</div><h1>📜 NƏTİCƏ VƏRƏQİ</h1><div style="font-size:14px;color:#6b7280;margin-top:6px">${exam.title}</div></div><div class="carnet-student"><div><strong>Ad Soyad:</strong> ${currentUser.name}</div><div><strong>Email:</strong> ${currentUser.email}</div><div><strong>Tarix:</strong> ${date}</div><div><strong>Ümumi bal:</strong> ${score.points}/${score.maxPoints} (${score.percent}%)</div></div><div class="carnet-total"><div class="total-label">Yekun Qiymət</div><div class="grade-badge grade-${score.grade}">${score.grade} — ${score.gradeText}</div><div style="margin-top:12px;font-size:14px;opacity:0.9">Düzgün cavab: ${score.correct}/${score.total} sual</div></div><table class="carnet-table"><thead><tr><th>Part</th><th>Sual</th><th>Cavab</th><th>Düzgün</th><th>Bal</th></tr></thead><tbody>`;
   score.review.forEach(r=>{ const m = MODULES[r.part]; html += `<tr class="${r.correct?'correct-row':'incorrect-row'}"><td>Part ${m.moduleNum}</td><td>${r.num}</td><td>${r.userAns||'—'}</td><td>${r.answer}</td><td><strong>${r.earned}/${r.points}</strong></td></tr>`; });
-  html += `</tbody></table><div style="background:#f9fafb;padding:16px;border-radius:10px;font-size:13px;color:#6b7280;line-height:1.6"><strong>Qiymət cədvəli:</strong><br>90–100% → 5 (Əla) • 75–89% → 4 (Yaxşı) • 60–74% → 3 (Orta) • 40–59% → 2 (Qənaətbəxş) • 0–39% → 1 (Qeyri-qənaətbəxş)</div></div><div class="carnet-actions"><button class="btn-restart" onclick="backToExams()">🏠 İmtahanlara Qayıt</button><button class="btn-carnet" onclick="window.print()">🖨️ Çap et</button></div>`;
+  html += `</tbody></table><div style="background:#f9fafb;padding:16px;border-radius:10px;font-size:13px;color:#6b7280;line-height:1.6"><strong>Qiymət cədvəli:</strong><br>90–100% → 5 (Əla) • 75–89% → 4 (Yaxşı) • 60–74% → 3 (Orta) • 40–59% → 2 (Qənaətbəxş) • 0–39% → 1 (Qeyri-qənaətbəxş)</div></div><div class="carnet-actions"><button class="btn-restart" onclick="backToExams()" onkeypress="if(event.key==='Enter')backToExams()">🏠 İmtahanlara Qayıt</button><button class="btn-carnet" onclick="window.print()" onkeypress="if(event.key==='Enter')window.print()">🖨️ Çap et</button></div>`;
   document.getElementById('carnetPage').innerHTML = html;
 }
 
@@ -551,7 +551,7 @@ function backToExams(){
   showExamList();
 }
 
-function startTimer(){ clearInterval(timerInterval); timerInterval = setInterval(()=>{ seconds++; const m = Math.floor(seconds/60).toString().padStart(2,'0'); const s = (seconds%60).toString().padStart(2,'0'); document.getElementById('timerDisplay').textContent = `${m}:${s}`; },1000); }
+function startTimer(){ clearInterval(timerInterval); timerInterval = setInterval(()=>{ seconds++; const m = Math.floor(seconds/60).toString().padStart(2,'0'); const s = (seconds%60).toString().padStart(2,'0'); const timerEl = document.getElementById('timerDisplay'); if(timerEl) timerEl.textContent = `${m}:${s}`; },1000); }
 function stopTimer(){ clearInterval(timerInterval); }
 
 // ==================== ADMIN ====================
@@ -643,18 +643,22 @@ function renderPointsEditor(){
       const pt = points[examId][pid][it.num]??1;
       html += `<tr><td><strong>${it.num}</strong></td><td>${it.answer}</td><td><input type="number" class="points-input" data-pid="${pid}" data-num="${it.num}" value="${pt}" min="0" max="10" step="0.5"></td></tr>`;
     });
-    html += `</tbody></table><button class="save-points-btn" onclick="savePoints('${examId}','${pid}')">💾 Yadda saxla</button></div>`;
+    html += `</tbody></table><button class="save-points-btn" onclick="savePointsForPart('${examId}','${pid}')">💾 Bütün Balları Yadda Saxla</button></div>`;
   });
   container.innerHTML = html;
 }
-function savePoints(examId,pid){
+function savePointsForPart(examId,pid){
   const inputs = document.querySelectorAll(`.points-input[data-pid="${pid}"]`);
-  const points = loadPoints();
+  let points = loadPoints();
   if(!points[examId]) points[examId] = {};
   if(!points[examId][pid]) points[examId][pid] = {};
-  inputs.forEach(inp=>{ const num = parseInt(inp.dataset.num); points[examId][pid][num] = parseFloat(inp.value)||0; });
+  inputs.forEach(inp=>{ 
+    const num = parseInt(inp.dataset.num); 
+    const val = parseFloat(inp.value)||0;
+    points[examId][pid][num] = val;
+  });
   savePoints(points);
-  alert('Ballar yadda saxlanıldı!');
+  alert('✅ Ballar uğurla yadda saxlanıldı!');
 }
 function renderResultsUserSelect(){
   const sel = document.getElementById('resultsUserSelect');
@@ -675,7 +679,7 @@ function renderUserResults(){
   examIds.forEach(eid=>{
     const sc = scores[eid];
     const exam = EXAMS[eid];
-    html += `<div style="background:#f9fafb;padding:16px;border-radius:10px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><strong>${exam?.title||eid}</strong><span class="grade-badge grade-${sc.grade}" style="font-size:18px;padding:8px 16px">${sc.grade} (${sc.percent}%)</span></div><div style="font-size:13px;color:#6b7280;margin-bottom:10px">${sc.points}/${sc.maxPoints} bal • ${sc.correct}/${sc.total} düzgün • ${new Date(sc.date).toLocaleString('az-AZ')}</div><button class="btn-sm btn-view" onclick="viewCarnetFromAdmin('${email}','${eid}')">📜 Karneti aç</button></div>`;
+    html += `<div style="background:#f9fafb;padding:16px;border-radius:10px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><strong>${exam?.title||eid}</strong><span class="grade-badge grade-${sc.grade}" style="font-size:18px;padding:8px 16px">${sc.grade} (${sc.percent}%)</span></div><div style="font-size:13px;color:#6b7280;margin-bottom:10px">${sc.points}/${sc.maxPoints} bal • ${sc.correct}/${sc.total} düzgün • ${new Date(sc.date).toLocaleString('az-AZ')}</div><button class="btn-sm btn-view" onclick="viewCarnetFromAdmin('${email}','${eid}')">📜 NƏTİCƏ VƏRƏQİ</button></div>`;
   });
   container.innerHTML = html;
 }
@@ -686,11 +690,11 @@ function viewCarnetFromAdmin(email,examId){
   if(!score) return;
   const exam = EXAMS[examId];
   const date = new Date(score.date).toLocaleString('az-AZ');
-  let html = `<div style="padding:20px"><div style="background:#fff;border-radius:16px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1)"><div style="text-align:center;border-bottom:3px double #1a1a2e;padding-bottom:20px;margin-bottom:24px"><div style="font-size:12px;color:#6b7280;letter-spacing:2px;text-transform:uppercase">Cambridge FCE Platform — Admin baxış</div><h1 style="font-family:Merriweather,serif;color:#1a1a2e">📜 Karnet</h1><div style="font-size:14px;color:#6b7280;margin-top:6px">${exam.title}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;padding:16px;background:#f9fafb;border-radius:10px"><div><strong>Ad:</strong> ${user.name}</div><div><strong>Email:</strong> ${user.email}</div><div><strong>Tarix:</strong> ${date}</div><div><strong>Bal:</strong> ${score.points}/${score.maxPoints} (${score.percent}%)</div></div><div style="background:linear-gradient(135deg,#1a1a2e,#2d2d4e);color:#fff;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px"><div style="font-size:14px;opacity:0.8;margin-bottom:8px">Yekun Qiymət</div><div style="display:inline-block;padding:16px 32px;border-radius:12px;font-size:28px;font-weight:900;background:${score.grade===5?'#16a34a':score.grade===4?'#2563eb':score.grade===3?'#fbbf24':score.grade===2?'#f97316':'#dc2626'};color:${score.grade===3?'#1a1a2e':'#fff'}">${score.grade} — ${score.gradeText}</div></div><table style="width:100%;border-collapse:collapse"><thead><tr><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Part</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Sual</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Cavab</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Düzgün</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Bal</th></tr></thead><tbody>`;
+  let html = `<div style="padding:20px"><div style="background:#fff;border-radius:16px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1)"><div style="text-align:center;border-bottom:3px double #1a1a2e;padding-bottom:20px;margin-bottom:24px"><div style="font-size:12px;color:#6b7280;letter-spacing:2px;text-transform:uppercase">CAMBRIDGE FCE PLATFORM — Admin baxış</div><h1 style="font-family:Merriweather,serif;color:#1a1a2e">📜 NƏTİCƏ VƏRƏQİ</h1><div style="font-size:14px;color:#6b7280;margin-top:6px">${exam.title}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;padding:16px;background:#f9fafb;border-radius:10px"><div><strong>Ad:</strong> ${user.name}</div><div><strong>Email:</strong> ${user.email}</div><div><strong>Tarix:</strong> ${date}</div><div><strong>Bal:</strong> ${score.points}/${score.maxPoints} (${score.percent}%)</div></div><div style="background:linear-gradient(135deg,#1a1a2e,#2d2d4e);color:#fff;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px"><div style="font-size:14px;opacity:0.8;margin-bottom:8px">Yekun Qiymət</div><div style="display:inline-block;padding:16px 32px;border-radius:12px;font-size:28px;font-weight:900;background:${score.grade===5?'#16a34a':score.grade===4?'#2563eb':score.grade===3?'#fbbf24':score.grade===2?'#f97316':'#dc2626'};color:${score.grade===3?'#1a1a2e':'#fff'}">${score.grade} — ${score.gradeText}</div></div><table style="width:100%;border-collapse:collapse"><thead><tr><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Part</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Sual</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Cavab</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Düzgün</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Bal</th></tr></thead><tbody>`;
   score.review.forEach(r=>{ const m = MODULES[r.part]; html += `<tr style="background:${r.correct?'#dcfce7':'#fee2e2'}"><td style="padding:12px;border-bottom:1px solid #e5e7eb">Part ${m.moduleNum}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.num}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.userAns||'—'}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.answer}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb"><strong>${r.earned}/${r.points}</strong></td></tr>`; });
   html += `</tbody></table></div></div>`;
   const w = window.open('','_blank','width=800,height=700');
-  w.document.write(`<html><head><title>Karnet — ${user.name}</title></head><body>${html}</body></html>`);
+  w.document.write(`<html><head><title>NƏTİCƏ VƏRƏQİ — ${user.name}</title></head><body>${html}</body></html>`);
 }
 
 // ==================== INIT ====================
