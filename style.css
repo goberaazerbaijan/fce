@@ -196,7 +196,7 @@ body{font-family:'Inter',sans-serif;background:#f0f0eb;color:#222;min-height:100
 .answer-row .a-wrong{color:#dc2626;text-decoration:line-through}
 .no-data{text-align:center;padding:40px;color:#9ca3af;font-size:14px}
 
-/* --- YENİ ƏLAVƏLƏR (Sual nömrələri və PDF) --- */
+/* --- YENİ ƏLAVƏLƏR --- */
 .question-numbers { flex: 1; display: flex; justify-content: center; align-items: center; }
 .q-numbers-grid { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .q-num { width: 32px; height: 32px; border-radius: 6px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: #6b7280; }

@@ -138,7 +138,7 @@ function showExamList(){
     let statusHtml = '<span class="status status-new">Yeni</span>';
     if(score){
       const pct = Math.round((score.correct/score.total)*100);
-      statusHtml = pct>=100?`<span class="status status-done">✅ ${pct}%</span>`:`<span class="status status-partial"> ${pct}%</span>`;
+      statusHtml = pct>=100?`<span class="status status-done">✅ ${pct}%</span>`:`<span class="status status-partial">⏳ ${pct}%</span>`;
     }
     const totalQ = exam.parts.reduce((s,pid)=>s+(MODULES[pid].questions?.length||MODULES[pid].gaps?.length||0),0);
     const card = document.createElement('div');
@@ -331,7 +331,7 @@ function renderQuestion(){
     });
     let html = `<div class="q-card"><div class="q-card-header"><div class="q-number">${g.num}</div><div class="q-title">${currentModuleId==='part2'?'Boşluğu doldurun (1 söz)':'Verilən sözdən yeni söz düzəldin'}</div></div><div class="q-context">${ctx}</div>`;
     if(currentModuleId==='part3'&&g.given) html += `<div class="q-word-given"><span class="kw-label">Verilən söz:</span>${g.given}</div>`;
-    html += `<div class="q-input-area"><label>Cavabınız</label><input type="text" class="q-main-input" id="mainInput" value="${val}" placeholder="cavabı yazın..." autocomplete="off" spellcheck="false" oninput="onInput(this.value)" onkeydown="onKeydown(event)"><div class="q-hint-text">${currentModuleId==='part2'?' Yalnız 1 söz yazın':'💡 Verilən sözdən kök dəyişərək yeni söz düzəldin'}</div></div></div>`;
+    html += `<div class="q-input-area"><label>Cavabınız</label><input type="text" class="q-main-input" id="mainInput" value="${val}" placeholder="cavabı yazın..." autocomplete="off" spellcheck="false" oninput="onInput(this.value)" onkeydown="onKeydown(event)"><div class="q-hint-text">${currentModuleId==='part2'?'💡 Yalnız 1 söz yazın':'💡 Verilən sözdən kök dəyişərək yeni söz düzəldin'}</div></div></div>`;
     container.innerHTML = html;
     setTimeout(()=>{ const inp = document.getElementById('mainInput'); if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length,inp.value.length); } },50);
   } else if(currentModuleId==='part4'){
@@ -507,7 +507,7 @@ function showFinalResults(){
       if(m.questions && m.questions.includes(it)) correct = answers[it.num]===it.answer;
       else if(m.gaps && m.gaps.includes(it)) correct = normalizeAnswer(answers[it.num])===it.answer;
       if(correct){ pCorrect++; pEarned += pt; totalCorrect++; }
-      review.push({part:pid,num:it.num,userAns:answers[it.num]||'—',correct,answer:it.answer,points:pt,earned:correct?pt:0,given:it.given,personName:pid==='part7'?m.people[it.answer]?.name:null});
+      review.push({part:pid,num:it.num,userAns:answers[it.num]||'—',correct,answer:it.answer,points:pt,earned:correct?pt:0,given:it.given,personName:pid==='part7'?m.people[it.answer]?.name:null,explanation:it.explanation});
     });
     breakdown.push({label:`Part ${m.moduleNum}`,score:pCorrect,total:items.length,points:pEarned,maxPoints:items.reduce((s,it)=>s+(points[pid]?.[it.num]??1),0)});
   });
@@ -521,7 +521,7 @@ function showFinalResults(){
   saveCurrentUser();
 
   let emoji,msg;
-  if(pct>=90){ emoji='🏆'; msg='Mükəmməl nəticə!'; } else if(pct>=75){ emoji='🎉'; msg='Əla iş!'; } else if(pct>=60){ emoji='💪'; msg='Yaxşı nəticə!'; } else if(pct>=40){ emoji='📚'; msg='Orta səviyyə.'; } else { emoji=''; msg='Daha çox çalışın!'; }
+  if(pct>=90){ emoji='🏆'; msg='Mükəmməl nəticə!'; } else if(pct>=75){ emoji='🎉'; msg='Əla iş!'; } else if(pct>=60){ emoji='💪'; msg='Yaxşı nəticə!'; } else if(pct>=40){ emoji='📚'; msg='Orta səviyyə.'; } else { emoji='💪'; msg='Daha çox çalışın!'; }
 
   document.getElementById('rEmoji').textContent = emoji;
   document.getElementById('rTitle').textContent = 'İmtahan Tamamlandı!';
@@ -559,9 +559,12 @@ function showCarnet(){
   if(!score) return;
   const exam = EXAMS[currentExamId];
   const date = new Date(score.date).toLocaleString('az-AZ');
-  let html = `<div class="carnet-card"><div class="carnet-header"><div class="school">CAMBRIDGE FCE PLATFORM</div><h1>📜 NƏTİCƏ VƏRƏQİ</h1><div style="font-size:14px;color:#6b7280;margin-top:6px">${exam.title}</div></div><div class="carnet-student"><div><strong>Ad Soyad:</strong> ${currentUser.name}</div><div><strong>Email:</strong> ${currentUser.email}</div><div><strong>Tarix:</strong> ${date}</div><div><strong>Nəticə:</strong> <span style="font-size:18px;font-weight:700;color:#1a1a2e">${score.points}/${score.maxPoints}</span> (${score.percent}%)</div></div><div class="carnet-total"><div class="total-label">Yekun Qiymət</div><div class="grade-badge grade-${score.grade}">${score.grade} — ${score.gradeText}</div><div style="margin-top:12px;font-size:14px;opacity:0.9">Düzgün cavab: ${score.correct}/${score.total} sual</div></div><table class="carnet-table"><thead><tr><th>Part</th><th>Sual</th><th>Cavab</th><th>Düzgün</th><th>Bal</th></tr></thead><tbody>`;
+  
+  let html = `<div class="carnet-card"><div class="carnet-header"><div class="school">CAMBRIDGE FCE PLATFORM</div><h1>📜 NƏTİCƏ VƏRƏQİ</h1><div style="font-size:14px;color:#6b7280;margin-top:6px">${exam.title}</div></div><div class="carnet-student"><div><strong>Ad Soyad:</strong> ${currentUser.name}</div><div><strong>Email:</strong> ${currentUser.email}</div><div><strong>Tarix:</strong> ${date}</div></div><div class="carnet-total"><div class="total-label">Nəticə</div><div class="grade-badge grade-${score.grade}" style="font-size:24px">${score.points}/${score.maxPoints} (${score.percent}%)</div></div><table class="carnet-table"><thead><tr><th>Part</th><th>Sual</th><th>Cavab</th><th>Düzgün</th><th>Bal</th></tr></thead><tbody>`;
+  
   score.review.forEach(r=>{ const m = MODULES[r.part]; html += `<tr class="${r.correct?'correct-row':'incorrect-row'}"><td>Part ${m.moduleNum}</td><td>${r.num}</td><td>${r.userAns||'—'}</td><td>${r.answer}</td><td><strong>${r.earned}/${r.points}</strong></td></tr>`; });
-  html += `</tbody></table><div style="background:#f9fafb;padding:16px;border-radius:10px;font-size:13px;color:#6b7280;line-height:1.6"><strong>Qiymət cədvəli:</strong><br>90–100% → 5 (Əla) • 75–89% → 4 (Yaxşı) • 60–74% → 3 (Orta) • 40–59% → 2 (Qənaətbəxş) • 0–39% → 1 (Qeyri-qənaətbəxş)</div></div><div class="carnet-actions"><button class="btn-restart" onclick="backToExams()" onkeypress="if(event.key==='Enter')backToExams()">🏠 İmtahanlara Qayıt</button><button class="btn-carnet" onclick="window.print()" onkeypress="if(event.key==='Enter')window.print()">🖨️ Çap et</button></div>`;
+  html += `</tbody></table></div><div class="carnet-actions"><button class="btn-restart" onclick="backToExams()" onkeypress="if(event.key==='Enter')backToExams()">🏠 İmtahanlara Qayıt</button><button class="btn-carnet" onclick="window.print()" onkeypress="if(event.key==='Enter')window.print()">🖨️ Çap et</button></div>`;
+  
   document.getElementById('carnetPage').innerHTML = html;
 }
 
@@ -584,7 +587,6 @@ function showAdmin(){
   document.getElementById('adminPage').classList.remove('hidden');
   renderAdminUsers(); renderAdminExams(); renderPointsExamSelect(); renderStudentResultsList(); renderMarkersList(); renderMarkerUserSelect();
   
-  // PDF upload listener
   const pdfInput = document.getElementById('pdfUpload');
   if(pdfInput) pdfInput.addEventListener('change', handlePDFUpload);
 }
@@ -634,8 +636,6 @@ async function handlePDFUpload(event){
 }
 
 function parsePDFAndCreateExam(text){
-  // Bu funksiya PDF mətnini təhlil edib imtahan yaratmalı
-  // Sadəlik üçün nümunə struktur göstərirəm
   alert('PDF oxundu. İmtahanın strukturu aşağıdakı kimidir:\n\n' + text.substring(0,500) + '...\n\n(Qeyd: Tam avtomatik PDF parser üçün əlavə kod lazımdır. İndilik əl ilə düzəliş edə bilərsiniz.)');
 }
 
@@ -741,14 +741,40 @@ function renderStudentResultsList(){
   let html = '<div style="display:grid;gap:16px">';
   users.forEach(user=>{
     const scores = user.scores||{};
-    const examCount = Object.keys(scores).length;
+    const examIds = Object.keys(scores);
     const totalPoints = Object.values(scores).reduce((sum,s)=>sum+(s.points||0),0);
     const maxPoints = Object.values(scores).reduce((sum,s)=>sum+(s.maxPoints||0),0);
     
-    html += `<div style="background:#f9fafb;padding:16px;border-radius:10px;border-left:4px solid #2563eb"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong style="font-size:16px">${user.name}</strong><span style="font-size:13px;color:#666">${user.email}</span></div><div style="font-size:13px;color:#666;margin-bottom:8px">Tamamlanan imtahan: ${examCount}</div><div style="font-size:14px"><strong>Ümumi bal:</strong> <span style="color:#1a1a2e;font-weight:700">${totalPoints}/${maxPoints}</span></div></div>`;
+    html += `<div style="background:#f9fafb;padding:16px;border-radius:10px;border-left:4px solid #2563eb"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong style="font-size:16px">${user.name}</strong><span style="font-size:13px;color:#666">${user.email}</span></div><div style="font-size:13px;color:#666;margin-bottom:8px">Tamamlanan imtahan: ${examIds.length}</div><div style="font-size:14px"><strong>Ümumi bal:</strong> <span style="color:#1a1a2e;font-weight:700">${totalPoints}/${maxPoints}</span></div>`;
+    
+    if(examIds.length>0){
+      html += `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">`;
+      examIds.forEach(eid=>{
+        const sc = scores[eid];
+        const exam = EXAMS[eid];
+        html += `<button class="btn-sm btn-view" onclick="viewCarnetFromAdmin('${user.email}','${eid}')">📜 ${exam?.title||eid} — ${sc.points}/${sc.maxPoints}</button>`;
+      });
+      html += `</div>`;
+    }
+    
+    html += `</div>`;
   });
   html += '</div>';
   container.innerHTML = html;
+}
+
+function viewCarnetFromAdmin(email,examId){
+  const user = loadUsers().find(u=>u.email===email);
+  if(!user) return;
+  const score = user.scores?.[examId];
+  if(!score) return;
+  const exam = EXAMS[examId];
+  const date = new Date(score.date).toLocaleString('az-AZ');
+  let html = `<div style="padding:20px"><div style="background:#fff;border-radius:16px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1)"><div style="text-align:center;border-bottom:3px double #1a1a2e;padding-bottom:20px;margin-bottom:24px"><div style="font-size:12px;color:#6b7280;letter-spacing:2px;text-transform:uppercase">CAMBRIDGE FCE PLATFORM — Admin baxış</div><h1 style="font-family:Merriweather,serif;color:#1a1a2e">📜 NƏTİCƏ VƏRƏQİ</h1><div style="font-size:14px;color:#6b7280;margin-top:6px">${exam.title}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;padding:16px;background:#f9fafb;border-radius:10px"><div><strong>Ad:</strong> ${user.name}</div><div><strong>Email:</strong> ${user.email}</div><div><strong>Tarix:</strong> ${date}</div><div><strong>Nəticə:</strong> ${score.points}/${score.maxPoints} (${score.percent}%)</div></div><div style="background:linear-gradient(135deg,#1a1a2e,#2d2d4e);color:#fff;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px"><div style="font-size:14px;opacity:0.8;margin-bottom:8px">Yekun Qiymət</div><div style="display:inline-block;padding:16px 32px;border-radius:12px;font-size:28px;font-weight:900;background:${score.grade===5?'#16a34a':score.grade===4?'#2563eb':score.grade===3?'#fbbf24':score.grade===2?'#f97316':'#dc2626'};color:${score.grade===3?'#1a1a2e':'#fff'}">${score.grade} — ${score.gradeText}</div></div><table style="width:100%;border-collapse:collapse"><thead><tr><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Part</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Sual</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Cavab</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Düzgün</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Bal</th></tr></thead><tbody>`;
+  score.review.forEach(r=>{ const m = MODULES[r.part]; html += `<tr style="background:${r.correct?'#dcfce7':'#fee2e2'}"><td style="padding:12px;border-bottom:1px solid #e5e7eb">Part ${m.moduleNum}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.num}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.userAns||'—'}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.answer}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb"><strong>${r.earned}/${r.points}</strong></td></tr>`; });
+  html += `</tbody></table></div></div>`;
+  const w = window.open('','_blank','width=800,height=700');
+  w.document.write(`<html><head><title>NƏTİCƏ VƏRƏQİ — ${user.name}</title></head><body>${html}</body></html>`);
 }
 
 // Marker Functions
@@ -771,6 +797,7 @@ function makeMarker(){
   alert(`✅ ${users[idx].name} marker təyin olundu!`);
   renderMarkerUserSelect();
   renderMarkersList();
+  renderAdminUsers();
 }
 
 function renderMarkersList(){
@@ -799,6 +826,7 @@ function removeMarker(email){
   saveUsers(users);
   renderMarkersList();
   renderMarkerUserSelect();
+  renderAdminUsers();
 }
 
 // ==================== INIT ====================
