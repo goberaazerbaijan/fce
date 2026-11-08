@@ -728,7 +728,7 @@ function savePointsForPart(examId,pid){
   alert('✅ Ballar uğurla yadda saxlanıldı!');
 }
 
-// Student Results List - DÜZƏLDİLMİŞ
+// Student Results List
 function renderStudentResultsList(){
   const container = document.getElementById('studentResultsList');
   const allUsers = loadUsers();
@@ -798,8 +798,8 @@ function viewCarnetFromAdmin(email, examId){
       </div>
       
       <div style="background:linear-gradient(135deg,#1a1a2e,#2d2d4e);color:#fff;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px">
-        <div style="font-size:14px;opacity:0.8;margin-bottom:8px">Yekun Qiymət</div>
-        <div id="carnetGradeBadge" style="display:inline-block;padding:16px 32px;border-radius:12px;font-size:28px;font-weight:900;background:${score.grade===5?'#16a34a':score.grade===4?'#2563eb':score.grade===3?'#fbbf24':score.grade===2?'#f97316':'#dc2626'};color:${score.grade===3?'#1a1a2e':'#fff'}">${score.grade} — ${score.gradeText}</div>
+        <div style="font-size:14px;opacity:0.8;margin-bottom:8px">Yekun Nəticə</div>
+        <div id="carnetGradeBadge" style="display:inline-block;padding:16px 32px;border-radius:12px;font-size:28px;font-weight:900;background:#dc2626;color:#fff">${score.points}/${score.maxPoints} (${score.percent}%)</div>
       </div>
       
       <table style="width:100%;border-collapse:collapse" id="carnetTable">
@@ -831,7 +831,7 @@ function viewCarnetFromAdmin(email, examId){
         data-idx="${idx}" data-email="${email}" data-exam="${examId}" 
         value="${r.earned}" min="0" max="${maxPt}" step="0.5" 
         style="width:70px;padding:6px;border:2px solid #e5e7eb;border-radius:6px;text-align:center;font-weight:700"
-        onchange="updateReviewScore(this)">
+        onchange="window.opener.updateReviewScore(this)">
         <span style="font-size:11px;color:#666">/${maxPt}</span>`;
     } else {
       html += `<strong>${r.earned}/${r.points}</strong>`;
@@ -844,7 +844,7 @@ function viewCarnetFromAdmin(email, examId){
   
   if(canEdit){
     html += `<div style="margin-top:20px;text-align:center">
-      <button onclick="recalculateAndSaveScore('${email}','${examId}')" 
+      <button onclick="window.opener.recalculateAndSaveScore('${email}','${examId}')" 
         style="padding:14px 32px;background:#16a34a;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">
         💾 Balları Yenilə və Yadda Saxla
       </button>
@@ -858,6 +858,7 @@ function viewCarnetFromAdmin(email, examId){
   w.document.write(`<html><head><title>NƏTİCƏ VƏRƏQİ — ${user.name}</title>
     <style>body{font-family:'Inter',sans-serif;padding:0;background:#f0f0eb}</style>
     </head><body>${html}</body></html>`);
+  w.document.close();
 }
 
 // Marker/Admin üçün sual balını real-time dəyişdirmə
@@ -942,18 +943,27 @@ function recalculateAndSaveScore(email, examId){
   user.scores[examId] = score;
   saveUsers(users);
   
+  // Ana pəncərədəki göstəriciləri yenilə
   try {
-    const totalDisplay = window.opener?.document?.getElementById('carnetTotalDisplay');
-    if(totalDisplay) totalDisplay.textContent = `${totalEarned}/${totalMax} (${pct}%)`;
-    
-    const gradeBadge = window.opener?.document?.getElementById('carnetGradeBadge');
-    if(gradeBadge){
-      const colors = {5:'#16a34a', 4:'#2563eb', 3:'#fbbf24', 2:'#f97316', 1:'#dc2626'};
-      gradeBadge.style.background = colors[grade] || '#dc2626';
-      gradeBadge.style.color = grade === 3 ? '#1a1a2e' : '#fff';
-      gradeBadge.textContent = `${grade} — ${gradeText}`;
+    const openerDoc = window.opener?.document;
+    if(openerDoc){
+      const totalDisplay = openerDoc.getElementById('carnetTotalDisplay');
+      if(totalDisplay) totalDisplay.textContent = `${totalEarned}/${totalMax} (${pct}%)`;
+      
+      const gradeBadge = openerDoc.getElementById('carnetGradeBadge');
+      if(gradeBadge){
+        const colors = {5:'#16a34a', 4:'#2563eb', 3:'#fbbf24', 2:'#f97316', 1:'#dc2626'};
+        gradeBadge.style.background = colors[grade] || '#dc2626';
+        gradeBadge.style.color = grade === 3 ? '#1a1a2e' : '#fff';
+        gradeBadge.textContent = `${totalEarned}/${totalMax} (${pct}%)`;
+      }
+      
+      // Admin nəticələr siyahısını yenilə
+      if(openerDoc.getElementById('adminResults')?.classList.contains('active')){
+        openerDoc.renderStudentResultsList();
+      }
     }
-  } catch(e){}
+  } catch(e){ console.error('UI yeniləmə xətası:', e); }
   
   alert(`✅ Nəticə uğurla yeniləndi!\n\nYeni bal: ${totalEarned}/${totalMax} (${pct}%)\nQiymət: ${grade} (${gradeText})`);
 }
