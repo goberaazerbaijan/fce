@@ -728,33 +728,41 @@ function savePointsForPart(examId,pid){
   alert('✅ Ballar uğurla yadda saxlanıldı!');
 }
 
-// Student Results List
+// Student Results List - DÜZƏLDİLMİŞ
 function renderStudentResultsList(){
   const container = document.getElementById('studentResultsList');
-  const users = loadUsers().filter(u=>u.role==='student');
+  const allUsers = loadUsers();
+  const students = allUsers.filter(u => u.role === 'student');
   
-  if(users.length===0){
+  if(students.length === 0){
     container.innerHTML = '<div class="no-data">Heç bir şagird yoxdur</div>';
     return;
   }
   
   let html = '<div style="display:grid;gap:16px">';
-  users.forEach(user=>{
-    const scores = user.scores||{};
+  students.forEach(user => {
+    const scores = user.scores || {};
     const examIds = Object.keys(scores);
-    const totalPoints = Object.values(scores).reduce((sum,s)=>sum+(s.points||0),0);
-    const maxPoints = Object.values(scores).reduce((sum,s)=>sum+(s.maxPoints||0),0);
+    const totalPoints = examIds.reduce((sum, eid) => sum + (scores[eid].points || 0), 0);
+    const maxPoints = examIds.reduce((sum, eid) => sum + (scores[eid].maxPoints || 0), 0);
     
-    html += `<div style="background:#f9fafb;padding:16px;border-radius:10px;border-left:4px solid #2563eb"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong style="font-size:16px">${user.name}</strong><span style="font-size:13px;color:#666">${user.email}</span></div><div style="font-size:13px;color:#666;margin-bottom:8px">Tamamlanan imtahan: ${examIds.length}</div><div style="font-size:14px"><strong>Ümumi bal:</strong> <span style="color:#1a1a2e;font-weight:700">${totalPoints}/${maxPoints}</span></div>`;
+    html += `<div style="background:#f9fafb;padding:16px;border-radius:10px;border-left:4px solid #2563eb">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <strong style="font-size:16px">${user.name}</strong>
+        <span style="font-size:13px;color:#666">${user.email}</span>
+      </div>
+      <div style="font-size:13px;color:#666;margin-bottom:8px">Tamamlanan imtahan: ${examIds.length} • Ümumi bal: <strong style="color:#1a1a2e">${totalPoints}/${maxPoints}</strong></div>`;
     
-    if(examIds.length>0){
+    if(examIds.length > 0){
       html += `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">`;
-      examIds.forEach(eid=>{
+      examIds.forEach(eid => {
         const sc = scores[eid];
         const exam = EXAMS[eid];
-        html += `<button class="btn-sm btn-view" onclick="viewCarnetFromAdmin('${user.email}','${eid}')">📜 ${exam?.title||eid} — ${sc.points}/${sc.maxPoints}</button>`;
+        html += `<button class="btn-sm btn-view" onclick="viewCarnetFromAdmin('${user.email}','${eid}')">📜 ${exam?.title || eid} — ${sc.points}/${sc.maxPoints} (${sc.percent}%)</button>`;
       });
       html += `</div>`;
+    } else {
+      html += `<div style="margin-top:10px;font-size:13px;color:#9ca3af;font-style:italic">Hələ nəticə yoxdur</div>`;
     }
     
     html += `</div>`;
@@ -763,18 +771,191 @@ function renderStudentResultsList(){
   container.innerHTML = html;
 }
 
-function viewCarnetFromAdmin(email,examId){
-  const user = loadUsers().find(u=>u.email===email);
+function viewCarnetFromAdmin(email, examId){
+  const user = loadUsers().find(u => u.email === email);
   if(!user) return;
   const score = user.scores?.[examId];
   if(!score) return;
   const exam = EXAMS[examId];
   const date = new Date(score.date).toLocaleString('az-AZ');
-  let html = `<div style="padding:20px"><div style="background:#fff;border-radius:16px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1)"><div style="text-align:center;border-bottom:3px double #1a1a2e;padding-bottom:20px;margin-bottom:24px"><div style="font-size:12px;color:#6b7280;letter-spacing:2px;text-transform:uppercase">CAMBRIDGE FCE PLATFORM — Admin baxış</div><h1 style="font-family:Merriweather,serif;color:#1a1a2e">📜 NƏTİCƏ VƏRƏQİ</h1><div style="font-size:14px;color:#6b7280;margin-top:6px">${exam.title}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;padding:16px;background:#f9fafb;border-radius:10px"><div><strong>Ad:</strong> ${user.name}</div><div><strong>Email:</strong> ${user.email}</div><div><strong>Tarix:</strong> ${date}</div><div><strong>Nəticə:</strong> ${score.points}/${score.maxPoints} (${score.percent}%)</div></div><div style="background:linear-gradient(135deg,#1a1a2e,#2d2d4e);color:#fff;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px"><div style="font-size:14px;opacity:0.8;margin-bottom:8px">Yekun Qiymət</div><div style="display:inline-block;padding:16px 32px;border-radius:12px;font-size:28px;font-weight:900;background:${score.grade===5?'#16a34a':score.grade===4?'#2563eb':score.grade===3?'#fbbf24':score.grade===2?'#f97316':'#dc2626'};color:${score.grade===3?'#1a1a2e':'#fff'}">${score.grade} — ${score.gradeText}</div></div><table style="width:100%;border-collapse:collapse"><thead><tr><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Part</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Sual</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Cavab</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Düzgün</th><th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Bal</th></tr></thead><tbody>`;
-  score.review.forEach(r=>{ const m = MODULES[r.part]; html += `<tr style="background:${r.correct?'#dcfce7':'#fee2e2'}"><td style="padding:12px;border-bottom:1px solid #e5e7eb">Part ${m.moduleNum}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.num}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.userAns||'—'}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.answer}</td><td style="padding:12px;border-bottom:1px solid #e5e7eb"><strong>${r.earned}/${r.points}</strong></td></tr>`; });
-  html += `</tbody></table></div></div>`;
-  const w = window.open('','_blank','width=800,height=700');
-  w.document.write(`<html><head><title>NƏTİCƏ VƏRƏQİ — ${user.name}</title></head><body>${html}</body></html>`);
+  const isMarker = currentUser && currentUser.role === 'marker';
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  const canEdit = isMarker || isAdmin;
+  
+  let html = `<div style="padding:20px">
+    <div style="background:#fff;border-radius:16px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1)">
+      <div style="text-align:center;border-bottom:3px double #1a1a2e;padding-bottom:20px;margin-bottom:24px">
+        <div style="font-size:12px;color:#6b7280;letter-spacing:2px;text-transform:uppercase">CAMBRIDGE FCE PLATFORM — ${canEdit ? 'Marker/Admin' : 'Admin'} baxış</div>
+        <h1 style="font-family:Merriweather,serif;color:#1a1a2e">📜 NƏTİCƏ VƏRƏQİ</h1>
+        <div style="font-size:14px;color:#6b7280;margin-top:6px">${exam.title}</div>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;padding:16px;background:#f9fafb;border-radius:10px">
+        <div><strong>Ad:</strong> ${user.name}</div>
+        <div><strong>Email:</strong> ${user.email}</div>
+        <div><strong>Tarix:</strong> ${date}</div>
+        <div><strong>Nəticə:</strong> <span id="carnetTotalDisplay">${score.points}/${score.maxPoints} (${score.percent}%)</span></div>
+      </div>
+      
+      <div style="background:linear-gradient(135deg,#1a1a2e,#2d2d4e);color:#fff;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px">
+        <div style="font-size:14px;opacity:0.8;margin-bottom:8px">Yekun Qiymət</div>
+        <div id="carnetGradeBadge" style="display:inline-block;padding:16px 32px;border-radius:12px;font-size:28px;font-weight:900;background:${score.grade===5?'#16a34a':score.grade===4?'#2563eb':score.grade===3?'#fbbf24':score.grade===2?'#f97316':'#dc2626'};color:${score.grade===3?'#1a1a2e':'#fff'}">${score.grade} — ${score.gradeText}</div>
+      </div>
+      
+      <table style="width:100%;border-collapse:collapse" id="carnetTable">
+        <thead>
+          <tr>
+            <th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Part</th>
+            <th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Sual</th>
+            <th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Cavab</th>
+            <th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Düzgün</th>
+            <th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Status</th>
+            <th style="padding:12px;text-align:left;background:#1a1a2e;color:#fbbf24;font-weight:700">Bal</th>
+          </tr>
+        </thead>
+        <tbody>`;
+  
+  score.review.forEach((r, idx) => {
+    const m = MODULES[r.part];
+    const maxPt = r.points || 1;
+    html += `<tr style="background:${r.correct?'#dcfce7':'#fee2e2'}" id="reviewRow_${idx}">
+      <td style="padding:12px;border-bottom:1px solid #e5e7eb">Part ${m.moduleNum}</td>
+      <td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.num}</td>
+      <td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.userAns || '—'}</td>
+      <td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.answer}</td>
+      <td style="padding:12px;border-bottom:1px solid #e5e7eb">${r.correct ? '✅ Düzgün' : '❌ Səhv'}</td>
+      <td style="padding:12px;border-bottom:1px solid #e5e7eb">`;
+    
+    if(canEdit){
+      html += `<input type="number" class="marker-score-input" 
+        data-idx="${idx}" data-email="${email}" data-exam="${examId}" 
+        value="${r.earned}" min="0" max="${maxPt}" step="0.5" 
+        style="width:70px;padding:6px;border:2px solid #e5e7eb;border-radius:6px;text-align:center;font-weight:700"
+        onchange="updateReviewScore(this)">
+        <span style="font-size:11px;color:#666">/${maxPt}</span>`;
+    } else {
+      html += `<strong>${r.earned}/${r.points}</strong>`;
+    }
+    
+    html += `</td></tr>`;
+  });
+  
+  html += `</tbody></table>`;
+  
+  if(canEdit){
+    html += `<div style="margin-top:20px;text-align:center">
+      <button onclick="recalculateAndSaveScore('${email}','${examId}')" 
+        style="padding:14px 32px;background:#16a34a;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">
+        💾 Balları Yenilə və Yadda Saxla
+      </button>
+      <p style="font-size:12px;color:#666;margin-top:8px">⚠️ Diqqət: Bu əməliyyat şagirdin ümumi balını və qiymətini yeniləyəcək.</p>
+    </div>`;
+  }
+  
+  html += `</div></div>`;
+  
+  const w = window.open('', '_blank', 'width=900,height=800');
+  w.document.write(`<html><head><title>NƏTİCƏ VƏRƏQİ — ${user.name}</title>
+    <style>body{font-family:'Inter',sans-serif;padding:0;background:#f0f0eb}</style>
+    </head><body>${html}</body></html>`);
+}
+
+// Marker/Admin üçün sual balını real-time dəyişdirmə
+function updateReviewScore(input){
+  const idx = parseInt(input.dataset.idx);
+  const email = input.dataset.email;
+  const examId = input.dataset.exam;
+  const newScore = parseFloat(input.value) || 0;
+  
+  const users = loadUsers();
+  const user = users.find(u => u.email === email);
+  if(!user || !user.scores?.[examId]) return;
+  
+  const review = user.scores[examId].review;
+  if(!review[idx]) return;
+  
+  const maxPt = review[idx].points || 1;
+  if(newScore > maxPt){
+    alert(`Maksimum bal ${maxPt}-dir!`);
+    input.value = review[idx].earned;
+    return;
+  }
+  if(newScore < 0){
+    alert(`Bal mənfi ola bilməz!`);
+    input.value = review[idx].earned;
+    return;
+  }
+  
+  review[idx].earned = newScore;
+  review[idx].correct = (newScore === maxPt);
+  
+  const row = input.closest('tr');
+  if(row){
+    row.style.background = review[idx].correct ? '#dcfce7' : '#fee2e2';
+    const statusCell = row.cells[4];
+    if(statusCell) statusCell.textContent = review[idx].correct ? '✅ Düzgün' : '❌ Səhv';
+  }
+  
+  user.scores[examId].review = review;
+  saveUsers(users);
+}
+
+// Ümumi balı yenidən hesabla və yadda saxla
+function recalculateAndSaveScore(email, examId){
+  const users = loadUsers();
+  const user = users.find(u => u.email === email);
+  if(!user || !user.scores?.[examId]) return;
+  
+  const score = user.scores[examId];
+  const review = score.review;
+  
+  let totalEarned = 0;
+  let totalMax = 0;
+  let correctCount = 0;
+  
+  review.forEach(r => {
+    const maxPt = r.points || 1;
+    totalMax += maxPt;
+    totalEarned += (r.earned || 0);
+    if(r.correct) correctCount++;
+  });
+  
+  const pct = totalMax > 0 ? Math.round((totalEarned / totalMax) * 100) : 0;
+  let grade, gradeText;
+  if(pct >= 90){ grade = 5; gradeText = 'Əla'; }
+  else if(pct >= 75){ grade = 4; gradeText = 'Yaxşı'; }
+  else if(pct >= 60){ grade = 3; gradeText = 'Orta'; }
+  else if(pct >= 40){ grade = 2; gradeText = 'Qənaətbəxş'; }
+  else { grade = 1; gradeText = 'Qeyri-qənaətbəxş'; }
+  
+  score.points = totalEarned;
+  score.maxPoints = totalMax;
+  score.percent = pct;
+  score.correct = correctCount;
+  score.grade = grade;
+  score.gradeText = gradeText;
+  score.review = review;
+  score.markerEdited = true;
+  score.markerEditedBy = currentUser?.name || 'Marker';
+  score.markerEditedAt = Date.now();
+  
+  user.scores[examId] = score;
+  saveUsers(users);
+  
+  try {
+    const totalDisplay = window.opener?.document?.getElementById('carnetTotalDisplay');
+    if(totalDisplay) totalDisplay.textContent = `${totalEarned}/${totalMax} (${pct}%)`;
+    
+    const gradeBadge = window.opener?.document?.getElementById('carnetGradeBadge');
+    if(gradeBadge){
+      const colors = {5:'#16a34a', 4:'#2563eb', 3:'#fbbf24', 2:'#f97316', 1:'#dc2626'};
+      gradeBadge.style.background = colors[grade] || '#dc2626';
+      gradeBadge.style.color = grade === 3 ? '#1a1a2e' : '#fff';
+      gradeBadge.textContent = `${grade} — ${gradeText}`;
+    }
+  } catch(e){}
+  
+  alert(`✅ Nəticə uğurla yeniləndi!\n\nYeni bal: ${totalEarned}/${totalMax} (${pct}%)\nQiymət: ${grade} (${gradeText})`);
 }
 
 // Marker Functions
